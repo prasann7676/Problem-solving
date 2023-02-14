@@ -1,13 +1,15 @@
 class Solution {
 public:
-    vector<int> recurse(string s){
+    vector<int> recurse(string &s){
         vector<int> res;
         int n = s.size();
         for(int i=0;i<n;i++){
             char cur = s[i];
             if(cur=='+' || cur=='-' || cur=='*'){
-                vector<int> left = recurse(s.substr(0,i));
-                vector<int> right = recurse(s.substr(i+1));
+                string tmp = s.substr(0,i);
+                vector<int> left = recurse(tmp);
+                tmp = s.substr(i+1);
+                vector<int> right = recurse(tmp);
                 for(auto l:left){
                     for(auto r:right){
                         int val=0;
