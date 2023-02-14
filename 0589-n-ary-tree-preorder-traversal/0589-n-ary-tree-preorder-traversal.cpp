@@ -21,6 +21,8 @@ public:
 class Solution {
 public:
     void recurse(Node *root, vector<int> &ans){
+        if(root==NULL)
+            return;
         ans.push_back(root->val);
         for(auto i:root->children){
             recurse(i,ans);
@@ -28,8 +30,6 @@ public:
     }
     vector<int> preorder(Node* root) {
         vector<int> ans;
-        if(root==NULL)
-            return ans;
         recurse(root,ans);
         return ans;
     }
