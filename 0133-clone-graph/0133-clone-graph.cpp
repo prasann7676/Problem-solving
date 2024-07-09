@@ -21,7 +21,7 @@ public:
 
 class Solution {
 public:
-    void dfs(Node *node, Node *&ans, vector<Node *> &vis){
+    void dfs(Node *&node, Node *&ans, vector<Node *> &vis){
         vis[node->val]=ans;
         for(auto i: node->neighbors){
             if(vis[i->val]){
