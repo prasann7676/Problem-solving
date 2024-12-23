@@ -1,40 +1,43 @@
 class Solution {
 public:
-    vector<int> leftmostBuildingQueries(vector<int>& heights,
-                                        vector<vector<int>>& queries) {
-        vector<vector<vector<int>>> storeQueries(heights.size());
-        priority_queue<vector<int>, vector<vector<int>>, greater<vector<int>>>
-            maxIndex;
-        vector<int> result(queries.size(), -1);
-
-        // Store the mappings for all queries in storeQueries.
-        for (int currQuery = 0; currQuery < queries.size(); currQuery++) {
-            int a = queries[currQuery][0], b = queries[currQuery][1];
-            if (a < b && heights[a] < heights[b]) {
-                result[currQuery] = b;
-            } else if (a > b && heights[a] > heights[b]) {
-                result[currQuery] = a;
-            } else if (a == b) {
-                result[currQuery] = a;
-            } else {
-                storeQueries[max(a, b)].push_back(
-                    {max(heights[a], heights[b]), currQuery});
+    static bool comp(pair<pair<int,int>,int> &a, pair<pair<int,int>,int> &b){
+        if(a.first.second==b.first.second)
+            return a.first.first>b.first.first;
+        return a.first.second>b.first.second;
+    }
+    vector<int> leftmostBuildingQueries(vector<int>& h, vector<vector<int>>& q) {
+        int n = h.size(),last=n-1;
+        vector<pair<pair<int,int>,int>> que;
+        vector<int> res((int)q.size());
+        for(int i=0;i<q.size();i++)
+            que.push_back({{min(q[i][0],q[i][1]),max(q[i][0],q[i][1])},i});
+        sort(que.begin(),que.end(),comp);
+        
+        map<int,int> mp;
+        vector<int> sor;
+        for(int i=0;i<q.size();i++){
+            int st = que[i].first.first, end = que[i].first.second, ind = que[i].second;
+            while(last>=end){
+                while(!sor.empty() && sor.back()<=h[last])
+                    sor.pop_back();
+                sor.push_back(h[last]);
+                mp[h[last]]=last;
+                last--;
+            }
+            if(st==end){
+                res[ind]=st;
+                continue;
+            }
+            if(h[end]>h[st])
+                res[ind]=end;
+            else{
+                auto it = upper_bound(sor.rbegin(),sor.rend(),h[st]);
+                if(it==sor.rend())
+                    res[ind]=-1;
+                else
+                    res[ind] = mp[(*it)];
             }
         }
-
-        for (int index = 0; index < heights.size(); index++) {
-            // If the priority queue's minimum pair value is less than the
-            // current index of height, it is an answer to the query.
-            while (!maxIndex.empty() && maxIndex.top()[0] < heights[index]) {
-                result[maxIndex.top()[1]] = index;
-                maxIndex.pop();
-            }
-            // Push the with their maximum index as the current index in the
-            // priority queue.
-            for (auto& element : storeQueries[index]) {
-                maxIndex.push(element);
-            }
-        }
-        return result;
+        return res;
     }
 };
